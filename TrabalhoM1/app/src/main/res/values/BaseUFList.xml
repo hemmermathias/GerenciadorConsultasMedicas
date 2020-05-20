@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="BaseUfList">
+        <item>SC</item>
+        <item>MG</item>
+        <item>DF</item>
+        <item>AM</item>
+        <item>RJ</item>
+        <item>SP</item>
+        <item>AC</item>
+        <item>PL</item>
+    </string-array>
+</resources>
