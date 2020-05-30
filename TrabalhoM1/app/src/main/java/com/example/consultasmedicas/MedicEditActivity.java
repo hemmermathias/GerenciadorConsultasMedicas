@@ -12,16 +12,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.consultasmedicas.dbschemes.MedicScheme;
+import com.example.consultasmedicas.util.BaseDataControllerActivity;
+import com.example.consultasmedicas.util.DatabaseHelper;
+import com.example.consultasmedicas.util.FormState;
+import com.example.consultasmedicas.util.MessageConstants;
 
-public class MedicEditActivity extends AppCompatActivity {
+public class MedicEditActivity extends BaseDataControllerActivity {
 
     SQLiteDatabase dbContext;
-
-    private boolean edit = false;
-    private String editID = "";
 
     EditText txtName;
     EditText txtCrm;
@@ -33,6 +32,7 @@ public class MedicEditActivity extends AppCompatActivity {
     EditText txtCellphone;
     EditText txtPhone;
     Button btnOk;
+    Button btnRemove;
     TextView lblOperation;
 
     @Override
@@ -50,26 +50,25 @@ public class MedicEditActivity extends AppCompatActivity {
         spnUf           = findViewById(R.id.spnUF);
         btnOk           = findViewById(R.id.btnAdd);
         lblOperation    = findViewById(R.id.lblOperation);
+        btnRemove       = findViewById((R.id.btnExcluir));
 
         spnUFAdapter = ArrayAdapter.createFromResource(this, R.array.BaseUfList, R.layout.support_simple_spinner_dropdown_item);
         spnUf.setAdapter(spnUFAdapter);
 
         dbContext = new DatabaseHelper(this).getWritableDatabase();
 
-        Bundle extras = getIntent().getExtras();
-        if(extras != null){
-            String buttonName = extras.getString("btnOkName");
-            btnOk.setText( buttonName != null ? buttonName : "ERROR");
+        btnOk.setText(this.intentMessage != null ? this.intentMessage.getString(MessageConstants.btnOkLabel, "Adicionar") : "Adicionar");
 
-            String currentWorkingId = extras.getString("id");
-            if(currentWorkingId != null && currentWorkingId.length() > 0){
-                this.edit = true;
-                this.editID = currentWorkingId;
-                FindMedic(editID);
+        lblOperation.setText(this.GetFormStateName());
+        if(this.formState == FormState.edit){
+            this.entityIdOnFocus = this.intentMessage != null ? this.intentMessage.getString(MessageConstants.entityID, null) : null;
+            if(this.entityIdOnFocus == null) {
+                this.formState = FormState.add;
+                return;
             }
+            FindMedic(this.entityIdOnFocus);
+            btnRemove.setVisibility(View.VISIBLE);
         }
-
-        GetOperationName();
     }
 
     private boolean ValidateEntry(){
@@ -143,12 +142,12 @@ public class MedicEditActivity extends AppCompatActivity {
         values.put(MedicScheme.C_CELLPHONE, txtCellphone.getText().toString());
         values.put(MedicScheme.C_PHONE, txtPhone.getText().toString());
 
-        if(!this.edit){
+        if(this.formState == FormState.add){
             long newRowId = dbContext.insert(MedicScheme.T_NAME, null, values);
             Toast.makeText(this, String.format("Médico inserido com sucesso! (ID: %d)", newRowId), Toast.LENGTH_LONG).show();
         }else{
-            if(dbContext.update(MedicScheme.T_NAME, values, String.format("_id = '%s'", this.editID), null) > 0)
-                Toast.makeText(this, String.format("Médico editado com sucesso! (ID: %s)", editID), Toast.LENGTH_LONG).show();
+            if(dbContext.update(MedicScheme.T_NAME, values, String.format("_id = '%s'", this.entityIdOnFocus), null) > 0)
+                Toast.makeText(this, String.format("Médico editado com sucesso! (ID: %s)", this.entityIdOnFocus), Toast.LENGTH_LONG).show();
         }
 
         ClearEntry();
@@ -165,11 +164,22 @@ public class MedicEditActivity extends AppCompatActivity {
         txtPhone.setText("");
     }
 
-    public void GetOperationName(){
-        if(this.edit){
-            lblOperation.setText("Editando");
-        }else{
-            lblOperation.setText("Adicionando");
+    public void Close (View view){
+        this.finish();
+    }
+
+    public void removeMedic(View view){
+        if(this.entityIdOnFocus == "" || this.entityIdOnFocus == null) return;
+
+        String sql = "DELETE FROM " + MedicScheme.T_NAME + " WHERE _id = " + this.entityIdOnFocus;
+        Cursor cursor = this.dbContext.rawQuery(sql, null);
+        if(cursor != null){
+            Toast.makeText(this, String.format("Médico deletado com sucesso! (ID: %s)", this.entityIdOnFocus), Toast.LENGTH_LONG).show();
+            cursor.close();
+            this.finish();
         }
+        else
+            Toast.makeText(this, String.format("Erro ao delettar médico! (ID: %s)", this.entityIdOnFocus), Toast.LENGTH_LONG).show();
+        cursor.close();
     }
 }

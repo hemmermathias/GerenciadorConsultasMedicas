@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.consultasmedicas.util.FormState;
+import com.example.consultasmedicas.util.MessageConstants;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -16,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void OpenAddMedic(View view) {
         Intent intent = new Intent(this, MedicEditActivity.class);
-        intent.putExtra("btnOkName", "Adicionar");
+        intent.putExtra(MessageConstants.btnOkLabel, "Adicionar");
+        intent.putExtra(MessageConstants.formState, FormState.add);
         startActivity(intent);
     }
 
@@ -27,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void OpenEditPatient(View view){
         Intent intent = new Intent(this, PatientEditActivity.class);
-        intent.putExtra("btnOkName", "Adicionar");
+        intent.putExtra(MessageConstants.btnOkLabel, "Adicionar");
+        intent.putExtra(MessageConstants.formState, FormState.add);
         startActivity(intent);
     }
 

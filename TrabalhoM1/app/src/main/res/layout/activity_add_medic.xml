@@ -121,12 +121,25 @@
                 android:text="Adicionar" />
 
             <Button
+                android:id="@+id/btnExcluir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:onClick="removeMedic"
+                android:text="Excluir"
+                android:visibility="gone"
+                tools:text="Excluir" />
+
+            <Button
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_weight="1"
+                android:onClick="Close"
                 android:text="Cancelar" />
         </LinearLayout>
 

@@ -6,16 +6,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.consultasmedicas.dbschemes.MedicScheme;
+import com.example.consultasmedicas.util.DatabaseHelper;
+import com.example.consultasmedicas.util.FormState;
+import com.example.consultasmedicas.util.MessageConstants;
 
 public class MedicListActivity extends AppCompatActivity {
 
@@ -39,8 +40,9 @@ public class MedicListActivity extends AppCompatActivity {
 
                 Intent i = new Intent(getApplicationContext(), MedicEditActivity.class);
 
-                i.putExtra("id", lblID.getText().toString());
-                i.putExtra("btnOkName", "Confirmar");
+                i.putExtra(MessageConstants.entityID, lblID.getText().toString());
+                i.putExtra(MessageConstants.btnOkLabel, "Confirmar");
+                i.putExtra(MessageConstants.formState, FormState.edit);
 
                 startActivity(i);
             }
@@ -60,7 +62,6 @@ public class MedicListActivity extends AppCompatActivity {
         if(dbContext == null) return;
 
         Cursor data = dbContext.rawQuery(String.format("SELECT * FROM %s", MedicScheme.T_NAME), null);
-        Toast.makeText(this, String.format("%d", data.getCount()), Toast.LENGTH_SHORT).show();
 
         String[] from = {"_id", "nome"};
         int[] to = {R.id.lblID, R.id.lblName};
